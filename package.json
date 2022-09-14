@@ -1,0 +1,24 @@
+{
+  "name": "imgsrv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joshimello/node-imgsrv.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Joshimello/node-imgsrv/issues"
+  },
+  "homepage": "https://github.com/Joshimello/node-imgsrv#readme",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "express": "^4.18.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}
