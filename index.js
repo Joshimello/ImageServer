@@ -14,7 +14,8 @@ imageFolderPath = path.join(__dirname, 'image')
 fs.existsSync(imageFolderPath) ? null : fs.mkdirSync(imageFolderPath)
 
 const watcher = chokidar.watch(imageFolderPath, {
-    persistent: true
+    persistent: true,
+    cwd: imageFolderPath
 })
 
 watcher.on('add', path => {
@@ -74,7 +75,7 @@ app.get('/upload', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    res.sendFile(images[Math.floor(Math.random()*images.length)])
+    res.sendFile(images[Math.floor(Math.random()*images.length)], { root: imageFolderPath })
 })
 
 const PORT = 3001 || process.env.PORT
