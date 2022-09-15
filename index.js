@@ -1,79 +1,77 @@
-const chokidar = require('chokidar')
 const express = require('express')
-const multer = require('multer')
-const path = require('path')
-const http = require('http')
+const fileUpload = require('express-fileupload')
+const chokidar = require('chokidar')
 const fs = require('fs')
-
 const app = express()
 
-count = 0
-images = []
-imageFolderPath = path.join(__dirname, 'image')
-fs.existsSync(imageFolderPath) ? null : fs.mkdirSync(imageFolderPath)
+app.use(fileUpload())
 
-const watcher = chokidar.watch(imageFolderPath, {
-    persistent: true,
-    cwd: imageFolderPath
+var images = []
+var count = 0
+
+fs.existsSync('./image/') ? null : fs.mkdirSync('./image/')
+
+fs.readdir('./image/', (err, files) => {
+    count = files.length
 })
 
-watcher.on('add', path => {
-    images.push(path)
-    count++
-})
+app.post('/upload', function(req, res) {
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, imageFolderPath)
-    },
-  
-    filename: (req, file, cb) => {
-        cb(null, count + path.extname(file.originalname))
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.')
     }
-})
 
-const upload = multer({ storage: storage })
+    if (req.files) {
+        if (req.files.file.length > 1) {
+            let promises = []
+            for (let i = 0; i < req.files.file.length; i++) {
+                count++
+                promises.push(new Promise(resolve => {
+                    req.files.file[i].mv(`./image/${count}.${req.files.file[i].mimetype.split('/')[1]}`, (err) => {
+                        err ? res.send(err) : resolve()
+                    })
+                }))
+            }
 
-app.post('/upload', upload.array('files'), (req, res) => {
-    res.redirect('/');
+            Promise.all(promises).then(() => {
+                res.redirect('/')
+            })
+        }
+
+        else {
+            count++
+            req.files.file.mv(`./image/${count}.${req.files.file.mimetype.split('/')[1]}`, (err) => {
+                err ? res.send(err) : res.redirect('/')
+            })
+        }
+    }
 })
 
 app.get('/upload', (req, res) => {
     res.send(`
-        <form id="form">
-            <div class="row">
-                <input class="u-full-width" id="files" type="file" multiple>
-                <button class="u-full-width button-primary" type='$.sub();mit'>oh yea</button>
-            </div>
+        <form ref='uploadForm' 
+            id='uploadForm' 
+            action='http://localhost:3003/upload' 
+            method='post' 
+            encType="multipart/form-data">
+            
+            <input type="file" name="file" multiple />
+            <input type='submit' value='uwu' />
         </form>
-
-        <script>
-            const form = document.getElementById("form");
-
-            form.addEventListener("submit", submitForm);
-
-            function submitForm(e) {
-                e.preventDefault()
-                const formData = new FormData()
-                const files = document.getElementById("files")
-                for(let i =0; i < files.files.length; i++) {
-                    formData.append("files", files.files[i])
-                }
-                fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(() => {
-                    window.location.replace('/')
-                })
-            }
-        </script>
     `)
 })
 
-app.get('/', (req, res) => {
-    image = images[Math.floor(Math.random()*images.length)]
-    res.sendFile(path.join(__dirname, 'image', image))
+const watcher = chokidar.watch(__dirname + '/image/', {
+    persistent: true,
+    cwd: __dirname + '/image/'
 })
 
-app.listen(3003);
+watcher.on('add', path => {
+    images.push(path)
+})
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/image/' + images[Math.floor(Math.random()*images.length)])
+})
+
+app.listen(3003)
