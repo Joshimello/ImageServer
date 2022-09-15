@@ -6,7 +6,6 @@ const http = require('http')
 const fs = require('fs')
 
 const app = express()
-const server = http.createServer(app)
 
 count = 0
 images = []
@@ -24,21 +23,19 @@ watcher.on('add', path => {
 })
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: (req, file, cb) => {
         cb(null, imageFolderPath)
     },
   
-    filename: function(req, file, cb) {
+    filename: (req, file, cb) => {
         cb(null, count + path.extname(file.originalname))
     }
 })
 
-const upload = multer({
-    storage: storage
-})
+const upload = multer({ storage: storage })
 
 app.post('/upload', upload.array('files'), (req, res) => {
-    res.json({ message: 'Successfully uploaded files' })
+    res.redirect('/');
 })
 
 app.get('/upload', (req, res) => {
@@ -46,7 +43,7 @@ app.get('/upload', (req, res) => {
         <form id="form">
             <div class="row">
                 <input class="u-full-width" id="files" type="file" multiple>
-                <button class="u-full-width button-primary" type='submit'>oh yea</button>
+                <button class="u-full-width button-primary" type='$.sub();mit'>oh yea</button>
             </div>
         </form>
 
@@ -75,9 +72,8 @@ app.get('/upload', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    res.sendFile(images[Math.floor(Math.random()*images.length)], { root: imageFolderPath })
+    image = images[Math.floor(Math.random()*images.length)]
+    res.sendFile(path.join(__dirname, 'image', image))
 })
 
-const PORT = 3001 || process.env.PORT
-
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+app.listen(3003);
