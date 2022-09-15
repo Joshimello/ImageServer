@@ -51,7 +51,7 @@ app.get('/upload', (req, res) => {
     res.send(`
         <form ref='uploadForm' 
             id='uploadForm' 
-            action='http://localhost:3003/upload' 
+            action='/upload' 
             method='post' 
             encType="multipart/form-data">
             
