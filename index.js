@@ -74,4 +74,17 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/image/' + images[Math.floor(Math.random()*images.length)])
 })
 
+app.get('/img/:file', (req, res) => {
+    res.sendFile(__dirname + '/image/' + req.params.file)
+})
+
+app.get('/api', (req, res) => {
+    res.json(images)
+})
+
+app.get('/all', (req, res) => {
+    res.sendFile(__dirname + '/index.html')
+})
+
+
 app.listen(3003)
