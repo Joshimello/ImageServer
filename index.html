@@ -7,15 +7,19 @@
     <title>uwu</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <style type="text/css">
-    	body {
+    	html {
+            overflow-y: scroll;
+        }
+
+        body {
     		margin: 0;
     		padding: 0;
     	}
 
     	#grid {
-    		width: 100vw;
+    		width: 100%; 
     		display: grid;
-    		grid-template-columns: repeat(8, 1fr);
+    		grid-template-columns: repeat(6, 1fr);
     	}
 
     	#grid > a {
@@ -28,6 +32,36 @@
     	#grid > a:hover {
     		transform: scale(0.9);
     	}
+
+        @media (max-width: 575px) {
+            #grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 576px) {
+            #grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            #grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            #grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            #grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
     </style>
 </head>
 
@@ -37,7 +71,7 @@
 	</div>
     <script>
         $.getJSON('/api', data => {
-    	data.forEach(item => {
+    	[...data].sort(() => 0.5 - Math.random()).forEach(item => {
     		$('#grid').append(`
     			<a href="/img/${item}" target="_blank" style="background-image: url('/img/${item}')"></a>
     		`)
