@@ -1,19 +1,12 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
+const uniqueFilename = require('unique-filename')
 const chokidar = require('chokidar')
 const fs = require('fs')
 const app = express()
-
 app.use(fileUpload())
 
-var images = []
-var count = 0
-
 fs.existsSync('./image/') ? null : fs.mkdirSync('./image/')
-
-fs.readdir('./image/', (err, files) => {
-    count = files.length
-})
 
 app.post('/upload', function(req, res) {
 
@@ -25,9 +18,8 @@ app.post('/upload', function(req, res) {
         if (req.files.file.length > 1) {
             let promises = []
             for (let i = 0; i < req.files.file.length; i++) {
-                count++
                 promises.push(new Promise(resolve => {
-                    req.files.file[i].mv(`./image/${count}.${req.files.file[i].mimetype.split('/')[1]}`, (err) => {
+                    req.files.file[i].mv(`${uniqueFilename('./image/')}.${req.files.file[i].mimetype.split('/')[1]}`, (err) => {
                         err ? res.send(err) : resolve()
                     })
                 }))
@@ -39,8 +31,7 @@ app.post('/upload', function(req, res) {
         }
 
         else {
-            count++
-            req.files.file.mv(`./image/${count}.${req.files.file.mimetype.split('/')[1]}`, (err) => {
+            req.files.file.mv(`${uniqueFilename('./image/')}.${req.files.file.mimetype.split('/')[1]}`, (err) => {
                 err ? res.send(err) : res.redirect('/')
             })
         }
@@ -66,6 +57,7 @@ const watcher = chokidar.watch(__dirname + '/image/', {
     cwd: __dirname + '/image/'
 })
 
+var images = []
 watcher.on('add', path => {
     images.push(path)
 })
